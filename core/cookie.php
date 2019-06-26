@@ -35,6 +35,10 @@ class Cookie
         }
     }
 
+    public function getAsArray(){
+
+    }
+
     //CREATE NEW COOKIE IF NOT OR OVERRIDE EXISTING ONE
     /**
      * @param $value
