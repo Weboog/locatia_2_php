@@ -1,0 +1,8 @@
+# Apache configuration file (see httpd.apache.org/docs/2.2/mod/quickreference.html)
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+# disable directory listing
+Options -Indexes
