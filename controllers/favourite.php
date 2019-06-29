@@ -1,5 +1,8 @@
 <?php
 
+
+require_once CORE . DS . 'cookie.php';
+
 class Favourite extends Controller
 {
 
