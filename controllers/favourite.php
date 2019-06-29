@@ -5,7 +5,7 @@ class Favourite extends Controller
 
     public function index()
     {
-        $this->render('index', $this->getModel()->getFavourite(Cookie::get(Cookie::FORMAT_ARRAY)));
+        $this->render('index', $this->getModel()->getFavourite(Cookie::getAsArray()));
     }
 
     public function add($appart)
@@ -13,10 +13,9 @@ class Favourite extends Controller
         Cookie::add($appart);
     }
 
-    //simple cookie listing for content
     public function show()
-    {
-        echo Cookie::get(Cookie::FORMAT_STR);
+    {   
+        Cookie::getAsString();
     }
 
     public function delete($id = null)
