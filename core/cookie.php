@@ -7,67 +7,66 @@ class Cookie
     private static $NAME = '__fav__locatia__';  //Default name of cookie
     private static $EXPIRES = (90 * 24 * 60 * 60); // 90 Day
     private static $PATH = '/';
-    //FORMAT ot return values of the cookie
-    public static $FORMAT_STR = 'string';
-    public static $FORMAT_ARRAY = 'array';
     
     //CONSTANTS
     const FORMAT_STR = 'string';
     const FORMAT_ARRAY = 'array';
+    const COOKIE_NOT_FOUND = 'COOKIE_NOT_FOUND';
+    const BAD_PARAM = 'BAD_PARAM';
 
-    //GET COOKIE VALUES AS STRING OR ARRAY
+
     /**
-     * @param $format
-     * @return array|bool|string
+     * 
+     * @return void
      */
-    public static function get($format)
-    {
-
-        if (!isset($_COOKIE[self::$NAME])) return false;
-
-        switch ($format) {
-            case self::$FORMAT_STR :
-                return $_COOKIE[self::$NAME];
-                break;
-            case self::$FORMAT_ARRAY:
-                return explode(',', $_COOKIE[self::$NAME]);
-                break;
-        }
+    public static function getAsString(): void{
+        echo $_COOKIE[self::$NAME];
     }
-
-    public function getAsArray(){
-
-    }
-
-    //CREATE NEW COOKIE IF NOT OR OVERRIDE EXISTING ONE
+    
+    
     /**
-     * @param $value
-     * @param bool $override
-     * @return bool
+     * 
+     * @return array
      */
-    public static function create($value, $override = false)
-    {
-        if ($override === true) {
-            return setcookie(self::$NAME, $value, time() + self::$EXPIRES, self::$PATH);
-        } else {
-            (!isset($_COOKIE[self::$NAME])) or exit('Can\t override the existing cookie.');
-            return setcookie(self::$NAME, $value, time() + self::$EXPIRES, self::$PATH);
-        }
+    public static function getAsArray(): array{
+        return explode(',', $_COOKIE[self::$NAME]);
     }
 
-    public static function drop(){
-        isset($_COOKIE[self::$NAME]) or exit('There is no cookie found to drop');
-        setcookie(self::$NAME, null, -1, self::$PATH);
+
+    /**
+     * 
+     * @param type $value
+     * @param type $override
+     * @return void
+     */
+    public static function create($value, $override = false): void{
+        
+        if($override === false){
+            if(isset($_COOKIE[self::$NAME])) self::JSON ('status', false);
+            self::JSON('status', setcookie(self::$NAME, $value, time() + self::$EXPIRES, self::$PATH));
+        }
+        self::JSON('status', setcookie(self::$NAME, $value, time() + self::$EXPIRES, self::$PATH));
+    }
+
+    
+    /**
+     * 
+     * @return void
+     */
+    public static function drop(): void{
+        self::JSON('status', setcookie(self::$NAME, null, -1, self::$PATH));
     }
 
     //ADD TO COOKIE
     /**
-     * @param $value
+     * 
+     * @param type $value
+     * @return void
      */
-    public static function add($value)
-    {
+    public static function add($value): void {
+        
         if (isset($_COOKIE[self::$NAME]) ){
-            is_numeric($value) or exit('Value to add must be numeric.');
+            is_numeric($value) or self::JSON('status', self::BAD_PARAM);
             //Retrieve data contained in old cookie
             $parts = self::get(self::$FORMAT_ARRAY);
             if (!in_array($value, $parts)){
@@ -80,23 +79,38 @@ class Cookie
     }
 
     //DELETE VALUE FROM COOKIE
-    public static function delete()
-    {
+    /**
+     * 
+     * @return void
+     */
+    public static function delete(): void {
 
-        $appart = func_get_arg(0);
-        isset($_COOKIE[self::$NAME]) or exit('There is no cookie found.');
-        if (!is_null($appart)) {
-            is_numeric($appart) or exit('Value to delete must be numeric.');
-            $parts = self::get(self::$FORMAT_ARRAY);
-            $key = array_search($appart, $parts);
+        $id = func_get_arg(0);
+        isset($_COOKIE[self::$NAME]) or self::JSON('status', self::COOKIE_NOT_FOUND);
+        if (!is_null($id)) {
+            is_numeric($id) or self::JSON('status', self::BAD_PARAM);
+            $parts = self::getAsArray();
+            $key = array_search($id, $parts);
             unset($parts[$key]);
             self::create(implode(',', $parts), true);
         } else {
-            $parts = self::get(self::$FORMAT_ARRAY);
+            $parts= self::getAsArray();
             array_pop($parts);
             self::create(implode(',', $parts), true);
         }
 
+    }
+    
+    /**
+     * 
+     * @param type $prop
+     * @param type $value
+     * @return void
+     */
+    private static function JSON($prop, $value): void{
+        header('Content-Type: application/json');
+        echo json_encode([$prop => $value]);
+        exit();
     }
 
 }
