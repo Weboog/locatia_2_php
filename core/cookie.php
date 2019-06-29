@@ -68,7 +68,7 @@ class Cookie
         if (isset($_COOKIE[self::$NAME]) ){
             is_numeric($value) or self::JSON('status', self::BAD_PARAM);
             //Retrieve data contained in old cookie
-            $parts = self::get(self::$FORMAT_ARRAY);
+            $parts = self::getAsArray();
             if (!in_array($value, $parts)){
                 array_push($parts, $value);
                 self::create(implode(',', $parts), true);
