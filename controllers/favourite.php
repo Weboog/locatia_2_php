@@ -11,9 +11,9 @@ class Favourite extends Controller
         $this->render('index', $this->getModel()->getFavourite(Cookie::getAsArray()));
     }
 
-    public function add($appart)
+    public function add($id)
     {
-        Cookie::add($appart);
+        Cookie::add($id);
     }
 
     public function show()
